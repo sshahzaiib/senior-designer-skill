@@ -6,7 +6,7 @@ Unconstrained LLMs emit the statistical median of their training data, and that 
 
 ## Proof it works — a real-world SwiftUI audit
 
-This isn't a vibes skill. Pointed at **Habivit**, a shipping iOS habit tracker (~4,200 LOC SwiftUI), the checklist scored it **31/59 — fails review** and surfaced *specific, severity-ranked* defects, not generic advice:
+This isn't a vibes skill. Pointed at [**Habivit**](https://apps.apple.com/app/habivit/id6776614163), a shipping iOS habit tracker (~4,200 LOC SwiftUI), the checklist scored it **31/59 — fails review** and surfaced *specific, severity-ranked* defects, not generic advice:
 
 ![Habivit iOS audited by the senior-designer skill: 31/59, fails review — 3 critical, 4 high, 6 medium, 15 lower-severity failures](examples/habivit-ios-audit.png)
 
@@ -54,6 +54,7 @@ senior-designer/
 ├── evals/evals.json              # eval prompts + assertions
 ├── examples/                     # real-world proof
 │   ├── habivit-ios-audit.png     # the audit chart
+│   ├── habivit-ios-audit.chart.html  # chart source (reproducible)
 │   └── habivit-ios-audit.html    # the full self-audit dossier
 └── references/
     ├── checklist.md              # the 43/55-item scored checklist

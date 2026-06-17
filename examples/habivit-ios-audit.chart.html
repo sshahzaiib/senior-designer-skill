@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<style>
+  :root{
+    --ink-0:#0C0C0C; --ink-2:#191919; --ink-3:#1F1E1C; --ink-5:#2E2D2A; --ink-6:#383838;
+    --text-3:#808080; --text-2:#949494; --text-1:#EFE9E1;
+    --accent:#F45A32; --pass:#7FA66A; --warn:#D9A441; --low:#5A564F;
+    --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;
+    --mono:ui-monospace,"SF Mono","IBM Plex Mono",Menlo,monospace;
+    --serif:"Iowan Old Style","New York",Georgia,serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{width:1200px;height:840px;background:var(--ink-0);color:var(--text-1);
+    font-family:var(--sans);letter-spacing:-0.01em;-webkit-font-smoothing:antialiased;}
+  .num{font-family:var(--mono);font-variant-numeric:tabular-nums;}
+  .frame{position:absolute;inset:28px;border:1px solid var(--ink-6);pointer-events:none;}
+  .wrap{position:absolute;inset:64px 72px;display:flex;flex-direction:column;}
+
+  .kicker{font-family:var(--mono);font-size:13px;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-2);}
+  .kicker b{color:var(--accent);font-weight:600;}
+
+  .verdict{display:flex;align-items:flex-end;gap:40px;margin-top:26px;}
+  .score{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:104px;line-height:0.82;font-weight:600;letter-spacing:-0.04em;white-space:nowrap;}
+  .score .of{color:var(--text-2);font-weight:400;font-size:42px;letter-spacing:-0.02em;}
+  .stamp{font-family:var(--serif);font-size:42px;font-weight:600;line-height:1;letter-spacing:0.05em;
+    text-transform:uppercase;color:var(--accent);padding-bottom:7px;border-bottom:2px solid var(--accent);}
+  .tally{font-family:var(--mono);font-size:14px;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-2);margin-bottom:8px;}
+  .tally .p{color:var(--pass);} .tally .f{color:var(--accent);}
+
+  .label{font-family:var(--mono);font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-3);
+    display:flex;align-items:center;gap:16px;margin-bottom:12px;}
+  .label::after{content:"";flex:1;height:1px;background:var(--ink-6);}
+
+  .allbar{margin-top:38px;}
+  .track{display:flex;height:20px;border-radius:2px;overflow:hidden;}
+  .seg{height:100%;border-right:2px solid var(--ink-0);}
+  .seg:last-child{border-right:none;}
+  .legend{display:flex;gap:28px;margin-top:12px;font-family:var(--mono);font-size:12.5px;letter-spacing:0.04em;color:var(--text-2);}
+  .legend span{display:inline-flex;align-items:center;gap:8px;}
+  .dot{width:9px;height:9px;border-radius:2px;display:inline-block;}
+
+  .sev{margin-top:40px;}
+  .row{display:grid;grid-template-columns:108px 1fr 34px;align-items:center;gap:18px;height:38px;}
+  .rname{font-family:var(--mono);font-size:13px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-2);}
+  .rbar{height:14px;border-radius:2px;}
+  .rct{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:15px;color:var(--text-1);text-align:right;}
+
+  .foot{margin-top:auto;padding-top:24px;border-top:1px solid var(--ink-6);}
+  .cause{font-size:18px;line-height:1.45;color:var(--text-1);max-width:62ch;}
+  .cause code{font-family:var(--mono);font-size:0.82em;background:var(--ink-3);padding:2px 6px;border-radius:2px;border:1px solid var(--ink-5);}
+  .cause .hot{color:var(--accent);font-weight:600;}
+  .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;}
+  .chip{font-family:var(--mono);font-size:12.5px;letter-spacing:0.03em;color:var(--text-2);
+    border:1px solid var(--ink-6);border-radius:2px;padding:6px 10px;}
+  .chip b{color:var(--accent);font-weight:600;}
+</style>
+</head>
+<body>
+  <div class="frame"></div>
+  <div class="wrap">
+    <p class="kicker">Evidence <b>·</b> the senior-designer checklist, run on a shipping iOS app (Habivit, ~4,200 LOC SwiftUI)</p>
+
+    <div class="verdict">
+      <p class="score num">31<span class="of">&thinsp;/&thinsp;59</span></p>
+      <p class="stamp">Fails review</p>
+      <p class="tally num"><span class="p">31&nbsp;pass</span> · <span class="f">28&nbsp;fail</span> · 6&nbsp;N/A &nbsp;—&nbsp; 53% pass rate</p>
+    </div>
+
+    <div class="allbar">
+      <div class="label">All 65 checks</div>
+      <div class="track">
+        <div class="seg" style="flex:0 0 47.7%;background:var(--pass);"></div>
+        <div class="seg" style="flex:0 0 43.1%;background:var(--accent);"></div>
+        <div class="seg" style="flex:0 0 9.2%;background:var(--ink-6);"></div>
+      </div>
+      <div class="legend">
+        <span><i class="dot" style="background:var(--pass)"></i>31 pass</span>
+        <span><i class="dot" style="background:var(--accent)"></i>28 fail</span>
+        <span><i class="dot" style="background:var(--ink-6)"></i>6 not applicable</span>
+      </div>
+    </div>
+
+    <div class="sev">
+      <div class="label">28 fails, ranked by severity</div>
+      <div class="row"><span class="rname">Critical</span><div class="rbar" style="width:9.3%;background:var(--accent);"></div><span class="rct">3</span></div>
+      <div class="row"><span class="rname">High</span><div class="rbar" style="width:12.4%;background:var(--warn);"></div><span class="rct">4</span></div>
+      <div class="row"><span class="rname">Medium</span><div class="rbar" style="width:18.6%;background:var(--text-2);"></div><span class="rct">6</span></div>
+      <div class="row"><span class="rname">Lower</span><div class="rbar" style="width:46.5%;background:var(--low);"></div><span class="rct">15</span></div>
+    </div>
+
+    <div class="foot">
+      <p class="cause">Most of the red traces to <span class="hot">one decision</span>: every size is a fixed <code>.font(.system(size: N))</code>, so the type never scales — that alone fails <span class="hot">8 items</span>. The checklist caught specifics, not vibes:</p>
+      <div class="chips">
+        <span class="chip"><b>0</b> VoiceOver labels app-wide</span>
+        <span class="chip">contrast <b>#616161 ≈ 3.0:1</b></span>
+        <span class="chip">touch targets <b>28–30pt</b></span>
+        <span class="chip">delete is <b>irreversible</b></span>
+        <span class="chip">Reduce Motion <b>ignored</b></span>
+        <span class="chip">save errors <b>swallowed</b></span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
