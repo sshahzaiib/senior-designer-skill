@@ -4,6 +4,14 @@ An evidence-based senior product designer for any UI/app design or build task �
 
 Unconstrained LLMs emit the statistical median of their training data, and that median *is* the "AI slop" aesthetic: indigo gradients, Inter, identical icon-card grids. This skill forces the research, deliberation, and scored verification that a human senior designer does and a median-sampling model skips. Every rule is sourced from **158 vetted design publications** — Apple HIG, WCAG, NN/g research, Bringhurst, Norman, Krug, *Refactoring UI* — not opinion. Output must pass a scored checklist (43 items web / 55 SwiftUI) before it ships.
 
+## Proof it works — a real-world SwiftUI audit
+
+This isn't a vibes skill. Pointed at **Habivit**, a shipping iOS habit tracker (~4,200 LOC SwiftUI), the checklist scored it **31/59 — fails review** and surfaced *specific, severity-ranked* defects, not generic advice:
+
+![Habivit iOS audited by the senior-designer skill: 31/59, fails review — 3 critical, 4 high, 6 medium, 15 lower-severity failures](examples/habivit-ios-audit.png)
+
+Concrete findings the checklist caught: **0 VoiceOver labels** app-wide, Dynamic Type frozen by hardcoded `.font(.system(size:))` across 8 view files (one decision failing 8 items), contrast `#616161 ≈ 3.0:1` on small labels, `28–30pt` touch targets, irreversible delete, and ignored Reduce Motion. It also credited what the app gets right (9/10 on anti-slop). Read the full self-audit: [`examples/habivit-ios-audit.html`](examples/habivit-ios-audit.html).
+
 ## What this UI/UX design skill does — a research-driven workflow
 
 - **Phase 0 — Platform gate:** web, SwiftUI, or both.
@@ -44,6 +52,9 @@ The skill auto-triggers whenever you ask Claude to design or build a UI — "bui
 senior-designer/
 ├── SKILL.md                      # the skill: phases, bans, operating rules
 ├── evals/evals.json              # eval prompts + assertions
+├── examples/                     # real-world proof
+│   ├── habivit-ios-audit.png     # the audit chart
+│   └── habivit-ios-audit.html    # the full self-audit dossier
 └── references/
     ├── checklist.md              # the 43/55-item scored checklist
     └── evidence-base.md          # all 158 sources, per-item scoring, rewrite log

@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Habivit iOS — Self-Audit: 31/59, Fails Review</title>
+<meta name="description" content="I graded my own habit tracker against a 59-point senior-designer checklist. 28 checks fail, led by hardcoded type that never scales and silent VoiceOver. The honest accounting." />
+
+<!-- Share meta. Page is screenshot-first; og.png (a capture of the hero) is optional and added later. -->
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Habivit iOS — Self-Audit: 31/59, Fails Review" />
+<meta property="og:description" content="I graded my own habit tracker against a 59-point design checklist. 28 fail, led by hardcoded type that never scales and silent VoiceOver. Real findings, no spin." />
+<meta property="og:image" content="og.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Habivit iOS — Self-Audit: 31/59, Fails Review" />
+<meta name="twitter:description" content="I graded my own habit tracker against a 59-point design checklist. 28 fail, led by hardcoded type that never scales and silent VoiceOver. Real findings, no spin." />
+<meta name="twitter:image" content="og.png" />
+
+<style>
+  /* ============================================================
+     SELF-AUDIT DOSSIER — design tokens
+     Graded-dossier frame · the app's SF-native voice · one serif accent
+     ============================================================ */
+  :root{
+    /* tinted-neutral scale, warm-biased, dark -> light */
+    --ink-0:#0C0C0C;  --ink-1:#141312;  --ink-2:#191919;  --ink-3:#1F1E1C;
+    --ink-4:#252525;  --ink-5:#2E2D2A;  --ink-6:#383838;
+    --grey-fail:#616161;          /* the app's failing muted grey — QUOTED as evidence only, never live text */
+    --text-3:#808080;             /* dimmed label — 4.95:1 on bg (AA) */
+    --text-2:#949494;             /* secondary — 6.45:1 on bg */
+    --text-1:#EFE9E1;             /* primary cream — 16.2:1 on bg */
+
+    --accent:#F45A32;             /* tomato — primary emphasis ONLY: verdict, critical flags, the tick */
+    --pass:#7FA66A;               /* used sparingly */
+    --warn:#D9A441;
+
+    /* type — SF system (sans + its mono sibling) + one serif accent word */
+    --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    --mono: ui-monospace, "SF Mono", "IBM Plex Mono", Menlo, monospace;
+    --serif: "Iowan Old Style", "New York", Georgia, "Times New Roman", serif;
+
+    /* type scale — tokenized; mono labels kept as a distinct functional tier (no literal below 13px) */
+    --t-label:13px;   /* tracked mono uppercase labels */
+    --t-read:15px;    /* secondary reading text & list rows */
+    --t-base:17px;    /* body */
+    --t-gloss:clamp(18px, 2.4vw, 21px);
+    --t-stmt:clamp(22px, 3vw, 28px);
+    --t-of:clamp(28px, 5vw, 48px);
+    --t-stamp:clamp(32px, 6vw, 52px);
+    --t-score:clamp(72px, 13vw, 124px);
+
+    /* spacing — 8px grid (4px fine) */
+    --s1:4px; --s2:8px; --s3:16px; --s4:24px; --s5:32px; --s6:48px; --s7:64px; --s8:96px;
+
+    /* radius — intentional scale: cards != chips */
+    --r-card:8px; --r-chip:2px;
+
+    --measure:62ch;
+    --ease:cubic-bezier(.22,.61,.36,1);
+    --hair:1px solid var(--ink-6);
+  }
+
+  *{box-sizing:border-box;}
+  html{ -webkit-text-size-adjust:100%; }
+  body{
+    margin:0;
+    background:var(--ink-0);
+    color:var(--text-1);
+    font-family:var(--sans);
+    font-size:var(--t-base);
+    line-height:1.5;
+    letter-spacing:-0.01em;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+  .num{ font-family:var(--mono); font-variant-numeric:tabular-nums; }
+  .visually-hidden{
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+    overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  }
+
+  main{ max-width:880px; margin:0 auto; }
+  section{ padding:0 var(--s4); }
+
+  /* ---- mono section labels (editorial; never numbered 01/02/03, never a pill) ---- */
+  .label{
+    font-family:var(--mono);
+    font-size:var(--t-label);
+    font-weight:400;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--text-2);
+    margin:0 0 var(--s4);
+    display:flex; align-items:center; gap:var(--s3);
+  }
+  .label::after{ content:""; flex:1; height:1px; background:var(--ink-6); }
+
+  /* ============================================================ BANNER ============ */
+  .banner{
+    border-bottom:var(--hair);
+    padding:var(--s3) var(--s4);
+    max-width:880px; margin:0 auto;
+  }
+  .banner dl{
+    margin:0; display:flex; flex-wrap:wrap; gap:var(--s2) var(--s4);
+    font-family:var(--mono); font-size:var(--t-label); letter-spacing:0.08em;
+    text-transform:uppercase; color:var(--text-2);
+  }
+  .banner .k{ color:var(--text-3); }
+  .banner .v{ color:var(--text-1); }
+  .banner div{ display:inline-flex; gap:var(--s1); }
+
+  /* ============================================================ HERO ============== */
+  .hero{
+    min-height:min(74vh, 640px);
+    display:flex; flex-direction:column; justify-content:center;
+    padding-top:var(--s5); padding-bottom:var(--s6);
+  }
+  .kicker{
+    font-family:var(--mono); font-size:var(--t-label); letter-spacing:0.16em;
+    text-transform:uppercase; color:var(--text-2); margin:0 0 var(--s5);
+  }
+  .kicker b{ color:var(--accent); font-weight:600; }
+
+  .verdict-row{ display:flex; flex-wrap:wrap; align-items:flex-end; gap:var(--s4) var(--s6); }
+
+  .score{
+    font-family:var(--mono); font-variant-numeric:tabular-nums;
+    font-size:var(--t-score);
+    font-weight:600; line-height:0.9; letter-spacing:-0.04em;
+    color:var(--text-1); margin:0;
+  }
+  .score .of{ color:var(--text-2); font-weight:400; font-size:var(--t-of); letter-spacing:-0.02em; }
+
+  .stamp{
+    font-family:var(--serif);
+    font-size:var(--t-stamp);
+    font-weight:600; line-height:1; letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin:0 0 var(--s1);
+    padding-bottom:var(--s2);
+    border-bottom:2px solid var(--accent);
+    align-self:flex-end;
+  }
+
+  .tally{
+    font-family:var(--mono); font-size:var(--t-label); letter-spacing:0.06em;
+    text-transform:uppercase; color:var(--text-2);
+    margin:var(--s4) 0 0;
+  }
+  .tally .fail{ color:var(--accent); }
+  .tally .pass{ color:var(--text-1); }
+
+  .gloss{
+    max-width:var(--measure);
+    font-size:var(--t-gloss); line-height:1.45;
+    color:var(--text-1); margin:var(--s5) 0 0;
+  }
+  .gloss em{ font-style:normal; color:var(--accent); }
+
+  /* ============================================================ ROOT CAUSE ======== */
+  .root{ padding-top:var(--s7); padding-bottom:var(--s6); }
+  .root .stmt{
+    max-width:var(--measure);
+    font-size:var(--t-stmt); line-height:1.35;
+    color:var(--text-1); margin:0; font-weight:500; letter-spacing:-0.015em;
+  }
+  .root .stmt code{
+    font-family:var(--mono); font-size:0.82em; color:var(--text-1);
+    background:var(--ink-3); padding:2px 6px; border-radius:var(--r-chip);
+    border:1px solid var(--ink-5); white-space:nowrap;
+  }
+  .root .stmt .hot{ color:var(--accent); }
+  .root .after{ max-width:var(--measure); color:var(--text-2); margin:var(--s4) 0 0; font-size:var(--t-read); line-height:1.5; }
+  .root .after b{ color:var(--text-1); font-weight:600; }
+
+  /* ============================================================ LEDGER =========== */
+  .ledger{ padding-top:var(--s7); }
+  .tier{
+    font-family:var(--mono); font-size:var(--t-label); font-weight:500;
+    letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--text-2); margin:var(--s6) 0 var(--s3); padding-top:var(--s3);
+    border-top:var(--hair); display:flex; justify-content:space-between; align-items:baseline;
+  }
+  .tier:first-of-type{ border-top:none; padding-top:0; margin-top:var(--s4); }
+  .tier .ct{ color:var(--text-3); font-weight:400; }
+
+  ul.rows{ list-style:none; margin:0; padding:0; }
+  ul.rows li{
+    display:grid;
+    grid-template-columns:28px 1fr;
+    gap:var(--s3);
+    padding:var(--s3) 0;
+    border-bottom:1px solid var(--ink-6);
+    align-items:start;
+  }
+  .flag{
+    font-family:var(--mono); font-size:var(--t-label); font-weight:600; line-height:24px;
+    width:24px; height:24px; text-align:center;
+    border:1px solid var(--ink-6); border-radius:var(--r-chip);
+    color:var(--text-2);
+  }
+  .flag.c{ color:var(--accent); border-color:var(--accent); }
+  .flag.h{ color:var(--warn); border-color:color-mix(in srgb, var(--warn) 55%, var(--ink-6)); }
+  .flag.m{ color:var(--text-2); }
+
+  .finding{ font-size:var(--t-read); font-weight:600; color:var(--text-1); line-height:1.35; }
+  .meta{
+    font-family:var(--mono); font-size:var(--t-label); line-height:1.55; color:var(--text-2);
+    margin-top:var(--s1); display:flex; flex-wrap:wrap; gap:var(--s1) var(--s4);
+  }
+  .meta .tag{ color:var(--text-3); letter-spacing:0.08em; text-transform:uppercase; }
+  .meta .ev{ color:var(--text-1); }
+  .meta .tg{ color:var(--text-2); }
+  .meta .ev .q{ color:var(--accent); }      /* the quoted failing value, e.g. #616161 ~3.0:1 */
+
+  .ledger-note{
+    font-family:var(--mono); font-size:var(--t-label); color:var(--text-3);
+    letter-spacing:0.04em; margin:var(--s4) 0 0; line-height:1.5;
+  }
+
+  /* ============================================================ STRENGTHS ======== */
+  .strengths{ padding-top:var(--s8); }
+  ul.good{ list-style:none; margin:0; padding:0; columns:2; column-gap:var(--s6); }
+  ul.good li{
+    break-inside:avoid; padding:var(--s2) 0 var(--s2) var(--s4);
+    position:relative; color:var(--text-1); font-size:var(--t-read); line-height:1.4;
+    border-bottom:1px solid var(--ink-6);
+  }
+  ul.good li::before{
+    content:""; position:absolute; left:0; top:16px;
+    width:8px; height:8px; border:1px solid var(--text-2); border-radius:var(--r-chip);
+  }
+  ul.good li .num{ color:var(--text-2); font-size:var(--t-label); }
+
+  /* ============================================================ MOMENTUM ========= */
+  .momentum{ padding-top:var(--s8); }
+  .momentum p{ max-width:var(--measure); color:var(--text-2); font-size:var(--t-read); line-height:1.55; margin:0 0 var(--s5); }
+  .momentum p b{ color:var(--text-1); font-weight:600; }
+  .band{ position:relative; margin-bottom:var(--s5); }
+  .band .track{ display:flex; height:8px; border-radius:var(--r-chip); overflow:hidden; }
+  .band .seg{ background:var(--ink-6); border-right:2px solid var(--ink-0); }
+  .band .seg:last-child{ border-right:none; }
+  .band .seg.in{ background:var(--text-3); }     /* active "Flowing" band, distinguishable >=3:1 */
+  .marker{ position:absolute; top:-8px; bottom:16px; width:2px; background:var(--accent); }
+  .marker::after{
+    content:"53%"; position:absolute; top:-20px; left:50%; transform:translateX(-50%);
+    font-family:var(--mono); font-size:var(--t-label); letter-spacing:0.04em; color:var(--accent); white-space:nowrap;
+  }
+  .band-legend{
+    display:flex; justify-content:space-between;
+    font-family:var(--mono); font-size:var(--t-label); letter-spacing:0.06em; text-transform:uppercase; color:var(--text-2);
+    margin-top:var(--s1);
+  }
+
+  /* ============================================================ FOOTER =========== */
+  footer{
+    margin-top:var(--s8); border-top:var(--hair);
+    padding:var(--s4); max-width:880px; margin-left:auto; margin-right:auto;
+  }
+  footer .line{
+    font-family:var(--mono); font-size:var(--t-label); letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--text-2); line-height:1.8;
+  }
+  footer .line .v{ color:var(--text-1); }
+  footer .pad{ height:var(--s7); }
+
+  /* ---- entrance: one-time, screenshot-safe (settles fast; reduced-motion = static final state) ---- */
+  @keyframes rise{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;} }
+  .hero > *{ animation:rise .5s var(--ease) both; }
+  .hero .kicker{ animation-delay:.02s; }
+  .hero .verdict-row{ animation-delay:.08s; }
+  .hero .tally{ animation-delay:.14s; }
+  .hero .gloss{ animation-delay:.20s; }
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition:none !important; }
+  }
+
+  /* ---- responsive ---- */
+  @media (max-width:640px){
+    section{ padding-left:var(--s3); padding-right:var(--s3); }
+    .banner, footer{ padding-left:var(--s3); padding-right:var(--s3); }
+    ul.good{ columns:1; }
+    .verdict-row{ gap:var(--s3); }
+    .stamp{ align-self:flex-start; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1 class="visually-hidden">Habivit iOS — design self-audit: 31 of 59 checks pass, fails review</h1>
+
+  <!-- ============ BANNER ============ -->
+  <header class="banner">
+    <dl>
+      <div><span class="k">Audit</span><span class="v">Habivit&nbsp;iOS</span></div>
+      <div><span class="k">Subject</span><span class="v num">com.shahzaib.Habitly</span></div>
+      <div><span class="k">Date</span><span class="v num">2026-06-17</span></div>
+      <div><span class="k">Author</span><span class="v">Self</span></div>
+    </dl>
+  </header>
+
+  <!-- ============ HERO (the screenshot frame) ============ -->
+  <section class="hero" aria-label="Verdict">
+    <p class="kicker">Senior-designer web checklist <b>·</b> self-audit <b>·</b> public</p>
+
+    <div class="verdict-row">
+      <p class="score num" aria-label="31 out of 59">31<span class="of" aria-hidden="true">&thinsp;/&thinsp;59</span></p>
+      <p class="stamp">Fails review</p>
+    </div>
+
+    <p class="tally num"><span class="pass">31&nbsp;pass</span> · <span class="fail">28&nbsp;fail</span> · 6&nbsp;N/A</p>
+
+    <p class="gloss">I graded my own habit tracker against a 59-point design checklist. It failed. Most of the failures trace to <em>one decision</em>: every font size is hardcoded, so the type never scales. Silent VoiceOver is a close second.</p>
+  </section>
+
+  <!-- ============ ROOT CAUSE ============ -->
+  <section class="root" aria-label="Root cause">
+    <h2 class="label">The one decision</h2>
+    <p class="stmt">Every piece of text is set with a fixed <code>.font(.system(size: N))</code> — sizes run from 40&nbsp;pt down to <span class="hot">7&nbsp;pt</span>, with zero Dynamic Type anywhere in the app.</p>
+    <p class="after">That single choice fails <b>eight checklist items</b> (T1, T4, T6, S1, S5, S6, plus C1 and S11): the text can't scale, and low-vision users get nothing. Fix it and roughly a third of the red turns green at once.</p>
+  </section>
+
+  <!-- ============ LEDGER ============ -->
+  <section class="ledger" aria-label="Findings ranked by severity">
+    <h2 class="label">Findings, ranked by severity</h2>
+
+    <h3 class="tier">Critical <span class="ct num">3</span></h3>
+    <ul class="rows">
+      <li>
+        <span class="flag c" aria-label="Critical">C</span>
+        <div>
+          <div class="finding">VoiceOver labels are absent app-wide</div>
+          <div class="meta"><span><span class="tag">Found</span> <span class="ev">0 accessibility labels in any view</span></span><span><span class="tag">Target</span> <span class="tg">every control labelled &amp; grouped</span></span></div>
+        </div>
+      </li>
+      <li>
+        <span class="flag c" aria-label="Critical">C</span>
+        <div>
+          <div class="finding">Dynamic Type does nothing — the text is frozen</div>
+          <div class="meta"><span><span class="tag">Found</span> <span class="ev">fixed <span class="num">.system(size:)</span> across 8 view files</span></span><span><span class="tag">Target</span> <span class="tg">text scales to the user's setting</span></span></div>
+        </div>
+      </li>
+      <li>
+        <span class="flag c" aria-label="Critical">C</span>
+        <div>
+          <div class="finding">Reduce Motion is ignored</div>
+          <div class="meta"><span><span class="tag">Found</span> <span class="ev">0 reduce-motion checks; springs always run</span></span><span><span class="tag">Target</span> <span class="tg">honour accessibilityReduceMotion</span></span></div>
+        </div>
+      </li>
+    </ul>
+
+    <h3 class="tier">High <span class="ct num">4</span></h3>
+    <ul class="rows">
+      <li>
+        <span class="flag h" aria-label="High">H</span>
+        <div>
+          <div class="finding">Contrast falls below AA on the smallest text</div>
+          <div class="meta"><span><span class="tag">Found</span> <span class="ev">muted grey <span class="q num">#616161 ≈ 3.0:1</span> on 8–10&nbsp;pt labels</span></span><span><span class="tag">Target</span> <span class="tg num">≥ 4.5:1</span></span></div>
+        </div>
+      </li>
+      <li>
+        <span class="flag h" aria-label="High">H</span>
+        <div>
+          <div class="finding">Touch targets are too small</div>
+          <div class="meta"><span><span class="tag">Found</span> <span class="ev">the commit toggle is <span class="num">28–30&nbsp;pt</span></span></span><span><span class="tag">Target</span> <span class="tg num">≥ 44&nbsp;pt</span></span></div>
+        </div>
+      </li>
+      <li>
+        <span class="flag h" aria-label="High">H</span>
+        <div>
+          <div class="finding">Deleting a habit is immediate and irreversible</div>
+          <div class="meta"><span><span class="tag">Found</span> <span class="ev">no confirmation, no undo</span></span><span><span class="tag">Target</span> <span class="tg">confirm or offer undo</span></span></div>
+        </div>
+      </li>
+      <li>
+        <span class="flag h" aria-label="High">H</span>
+        <div>
+          <div class="finding">Save errors are swallowed silently</div>
+          <div class="meta"><span><span class="tag">Found</span> <span class="ev"><span class="num">try?</span> throughout; failures just vanish</span></span><span><span class="tag">Target</span> <span class="tg">surface the failure</span></span></div>
+        </div>
+      </li>
+    </ul>
+
+    <h3 class="tier">Medium <span class="ct num">6</span></h3>
+    <ul class="rows">
+      <li><span class="flag m" aria-label="Medium">M</span><div><div class="finding">The commit animation replays on the most-frequent action</div><div class="meta"><span><span class="tag">Found</span> <span class="ev">scale-bounce + 1.2s flash on every tap</span></span></div></div></li>
+      <li><span class="flag m" aria-label="Medium">M</span><div><div class="finding">A floating&nbsp;+ button instead of an iOS toolbar&nbsp;+</div><div class="meta"><span><span class="tag">Found</span> <span class="ev">a Material-style FAB</span></span></div></div></li>
+      <li><span class="flag m" aria-label="Medium">M</span><div><div class="finding">No swipe-to-delete and no context menu</div><div class="meta"><span><span class="tag">Found</span> <span class="ev">delete is buried two taps deep</span></span></div></div></li>
+      <li><span class="flag m" aria-label="Medium">M</span><div><div class="finding">No haptic on the signature commit</div><div class="meta"><span><span class="tag">Found</span> <span class="ev">the core toggle is silent</span></span></div></div></li>
+      <li><span class="flag m" aria-label="Medium">M</span><div><div class="finding">The paywall shows “…” while the price loads</div><div class="meta"><span><span class="tag">Found</span> <span class="ev">no spinner, no skeleton</span></span></div></div></li>
+      <li><span class="flag m" aria-label="Medium">M</span><div><div class="finding">Notification permission is requested at first launch</div><div class="meta"><span><span class="tag">Found</span> <span class="ev">not tied to a value moment</span></span></div></div></li>
+    </ul>
+
+    <p class="ledger-note">Showing the 13 most severe of 28 fails. The other 15 are lower-priority checklist items.</p>
+  </section>
+
+  <!-- ============ STRENGTHS ============ -->
+  <section class="strengths" aria-label="What it gets right">
+    <h2 class="label">What it gets right · 9/10 on anti-slop</h2>
+    <ul class="good">
+      <li>Distinctive warm-tomato identity (<span class="num">#F45A32</span>), not indigo</li>
+      <li>Warm-cream text (<span class="num">#EFE9E1</span>), never pure white on black</li>
+      <li>Near-black warm surfaces (<span class="num">#0C0C0C / #191919 / #252525</span>)</li>
+      <li>A monospaced data-label motif that's genuinely its own</li>
+      <li>Tight verb+object copy: “Add habit”, “Create stack”</li>
+      <li>Correct push vs. sheet modality throughout</li>
+      <li>Primary actions sit in the thumb zone</li>
+      <li>No vanilla component defaults anywhere</li>
+    </ul>
+  </section>
+
+  <!-- ============ MOMENTUM (graded on its own metric) ============ -->
+  <section class="momentum" aria-label="Graded on its own metric">
+    <h2 class="label">Graded on its own metric</h2>
+    <p>Habivit's headline feature is <b>momentum</b>: a recency-weighted score bucketed Dormant → On&nbsp;Fire. Turn that instrument on the app's own design and the 53% pass-rate lands squarely in <b>Flowing</b>. The metric it sells says things are going fine. The review disagrees.</p>
+    <div class="band" role="img" aria-label="The 53% pass rate falls in the Flowing band of the app's own momentum scale">
+      <div class="track">
+        <div class="seg" style="flex:0 0 20%"></div>
+        <div class="seg" style="flex:0 0 25%"></div>
+        <div class="seg in" style="flex:0 0 25%"></div>
+        <div class="seg" style="flex:0 0 18%"></div>
+        <div class="seg" style="flex:0 0 12%"></div>
+      </div>
+      <div class="marker" style="left:52.5%"></div>
+    </div>
+    <div class="band-legend">
+      <span>Dormant</span><span>Building</span><span>Flowing</span><span>Strong</span><span>On&nbsp;fire</span>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer>
+    <p class="line">Self-audit · public · <span class="v">Habivit iOS</span> · <span class="v num">~4,200 LOC · 4 widgets</span></p>
+    <p class="line">Method · <span class="v">senior-designer web checklist</span> · <span class="v num">65 items · 6 N/A · 59 scored · 31 pass / 28 fail</span></p>
+  </footer>
+  <div class="pad"></div>
+
+</main>
+</body>
+</html>
